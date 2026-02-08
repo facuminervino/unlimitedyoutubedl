@@ -68,15 +68,20 @@ class handler(BaseHTTPRequestHandler):
 
         except Exception as e:
             raw_error = str(e)
-            error_msg = raw_error
             if "Private video" in raw_error or "Sign in" in raw_error:
                 error_msg = "Este video es privado o requiere iniciar sesion."
             elif "Video unavailable" in raw_error:
                 error_msg = "Este video no esta disponible."
+            elif "not made this video available in your country" in raw_error:
+                error_msg = "Este video tiene restriccion geografica y no se puede descargar desde nuestro servidor. Proba con otro video."
             elif "age" in raw_error.lower():
                 error_msg = "Este video tiene restriccion de edad."
+            elif "copyright" in raw_error.lower():
+                error_msg = "Este video fue bloqueado por derechos de autor."
+            else:
+                error_msg = "No se pudo obtener el video. Intenta de nuevo mas tarde."
 
-            self._send_json(500, {"error": error_msg, "debug": raw_error})
+            self._send_json(500, {"error": error_msg})
 
     def _send_json(self, status: int, data: dict):
         self.send_response(status)
